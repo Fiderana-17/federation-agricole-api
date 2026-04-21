@@ -414,3 +414,36 @@ components:
           type: number
         montantImpaye:
           type: number
+
+    AdmissionMembre:
+      type: object
+      required: [ nom, prenom, email, metier, domaine, parrains, cotisationAnnuelle ]
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+        email:
+          type: string
+        metier:
+          type: string
+        domaine:
+          type: string
+        parrains:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [ membreId, collectiviteId, relation ]
+            properties:
+              membreId:
+                type: integer
+              collectiviteId:
+                type: integer
+              relation:
+                type: string
+        fraisAdhesion:
+          type: number
+          example: 50000
+        cotisationAnnuelle:
+          type: number
