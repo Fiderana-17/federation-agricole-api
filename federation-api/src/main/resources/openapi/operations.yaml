@@ -1,85 +1,85 @@
 paths:
 
-  /cotisations:
+  /contributions:
     post:
-      tags: [Cotisations]
-      summary: Enregistrer une cotisation
+      tags: [Contributions]
+      summary: Register a contribution
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Cotisation'
+              $ref: '#/components/schemas/Contribution'
       responses:
         201:
-          description: Cotisation enregistrée
+          description: Contribution registered
 
     get:
-      tags: [Cotisations]
-      summary: Liste des cotisations
+      tags: [Contributions]
+      summary: List all contributions
       responses:
         200:
           description: OK
 
-  /comptes:
+  /accounts:
     post:
-      tags: [Comptes]
-      summary: Créer un compte
+      tags: [Accounts]
+      summary: Create an account
       description: |
-        - Une seule caisse autorisée
-        - Titulaire = membre réel
+        - Only one fund authorized
+        - Holder = actual member
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Compte'
+              $ref: '#/components/schemas/Account'
       responses:
         201:
-          description: Compte créé
+          description: Account created
 
     get:
-      tags: [Comptes]
-      summary: Liste des comptes
+      tags: [Accounts]
+      summary: List all accounts
       responses:
         200:
           description: OK
 
-  /activites:
+  /activities:
     post:
-      tags: [Activites]
-      summary: Créer une activité
+      tags: [Activities]
+      summary: Create an activity
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Activite'
+              $ref: '#/components/schemas/Activity'
       responses:
         201:
-          description: Activité créée
+          description: Activity created
 
     get:
-      tags: [Activites]
-      summary: Liste des activités
+      tags: [Activities]
+      summary: List all activities
       responses:
         200:
           description: OK
 
-  /presences:
+  /attendance:
     post:
-      tags: [Presences]
-      summary: Enregistrer présence
+      tags: [Attendance]
+      summary: Register attendance
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Presence'
+              $ref: '#/components/schemas/Attendance'
       responses:
         201:
-          description: Présence enregistrée
+          description: Attendance registered
 
-  /statistiques/membre/{id}:
+  /statistics/member/{id}:
     get:
-      tags: [Statistiques]
-      summary: Statistiques membre
+      tags: [Statistics]
+      summary: Member statistics
       parameters:
         - in: path
           name: id
@@ -92,12 +92,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatistiqueMembre'
+                $ref: '#/components/schemas/MemberStatistics'
 
-  /statistiques/collectivite/{id}:
+  /statistics/community/{id}:
     get:
-      tags: [Statistiques]
-      summary: Statistiques collectivité
+      tags: [Statistics]
+      summary: Community statistics
       parameters:
         - in: path
           name: id
