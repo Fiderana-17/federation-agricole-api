@@ -1,60 +1,60 @@
 paths:
 
-  /collectivites:
+  /communities:
     post:
-      tags: [Collectivites]
-      summary: Créer une collectivité
+      tags: [Communities]
+      summary: Create a community
       description: |
-        Conditions :
-        - Minimum 10 membres
-        - Ancienneté >= 6 mois
-        - Postes obligatoires remplis
+        Conditions:
+        - Minimum of 10 members
+        - Seniority/Tenure >= 6 months
+        - Mandatory positions filled
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Collectivite'
+              $ref: '#/components/schemas/Community'
       responses:
         201:
-          description: Collectivité créée
+          description: Community created
         400:
-          description: Conditions non respectées
+          description: Conditions not met
 
     get:
-      tags: [Collectivites]
-      summary: Liste des collectivités
+      tags: [Communities]
+      summary: List all communities
       responses:
         200:
           description: OK
 
-  /membres:
+  /members:
     post:
-      tags: [Membres]
-      summary: Ajouter un membre
+      tags: [Members]
+      summary: Add a member
       description: |
-        - Parrainage obligatoire
-        - Paiement requis
+        - Mandatory sponsorship/referral
+        - Payment required
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Membre'
+              $ref: '#/components/schemas/Member'
       responses:
         201:
-          description: Membre créé
+          description: Member created
 
     get:
-      tags: [Membres]
-      summary: Liste des membres
+      tags: [Members]
+      summary: List all members
       responses:
         200:
           description: OK
 
-  /membres/{id}/changer-collectivite:
+  /members/{id}/transfer-community:
     put:
-      tags: [Membres]
-      summary: Changer de collectivité
+      tags: [Members]
+      summary: Transfer to another community
       parameters:
         - in: path
           name: id
@@ -63,12 +63,12 @@ paths:
             type: integer
       responses:
         200:
-          description: Collectivité changée
+          description: Community changed successfully
 
-  /membres/{id}/demission:
+  /members/{id}/resignation:
     put:
-      tags: [Membres]
-      summary: Démission
+      tags: [Members]
+      summary: Resignation
       parameters:
         - in: path
           name: id
@@ -77,24 +77,24 @@ paths:
             type: integer
       responses:
         200:
-          description: Démission effectuée
+          description: Resignation processed
 
-  /mandats:
+  /mandates:
     post:
-      tags: [Mandats]
-      summary: Créer mandat
+      tags: [Mandates]
+      summary: Create a mandate
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Mandat'
+              $ref: '#/components/schemas/Mandate'
       responses:
         201:
-          description: Mandat créé
+          description: Mandate created
 
     get:
-      tags: [Mandats]
-      summary: Liste des mandats
+      tags: [Mandates]
+      summary: List all mandates
       responses:
         200:
           description: OK
