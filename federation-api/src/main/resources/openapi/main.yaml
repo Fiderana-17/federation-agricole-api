@@ -73,6 +73,41 @@ paths:
         200:
           description: OK
 
+  /membres/admission:
+    post:
+      tags: [ Membres ]
+      summary: Admission avancée d’un membre
+      description: |
+        Nouvelles conditions d’admission :
+
+        - Minimum 2 parrains
+        - Les parrains de la collectivité cible >= autres
+
+        Cas autorisés :
+        Parrains majoritairement de la collectivité cible
+         Mélange local + externe
+
+        Cas refusé :
+          Parrains uniquement externes
+
+        Paiement obligatoire :
+        - 50.000 Ar frais d’adhésion
+        - Cotisation annuelle complète
+
+        Informations :
+        - relation avec chaque parrain
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AdmissionMembre'
+    responses:
+      201:
+        description: Membre admis
+      400:
+        description: Conditions non respectées
+
   /membres/{id}/changer-collectivite:
     put:
       tags: [Membres]
@@ -100,6 +135,7 @@ paths:
       responses:
         200:
           description: Démission effectuée
+
 
   /mandats:
     post:
