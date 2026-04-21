@@ -1,0 +1,109 @@
+paths:
+
+  /cotisations:
+    post:
+      tags: [Cotisations]
+      summary: Enregistrer une cotisation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cotisation'
+      responses:
+        201:
+          description: Cotisation enregistrée
+
+    get:
+      tags: [Cotisations]
+      summary: Liste des cotisations
+      responses:
+        200:
+          description: OK
+
+  /comptes:
+    post:
+      tags: [Comptes]
+      summary: Créer un compte
+      description: |
+        - Une seule caisse autorisée
+        - Titulaire = membre réel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Compte'
+      responses:
+        201:
+          description: Compte créé
+
+    get:
+      tags: [Comptes]
+      summary: Liste des comptes
+      responses:
+        200:
+          description: OK
+
+  /activites:
+    post:
+      tags: [Activites]
+      summary: Créer une activité
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activite'
+      responses:
+        201:
+          description: Activité créée
+
+    get:
+      tags: [Activites]
+      summary: Liste des activités
+      responses:
+        200:
+          description: OK
+
+  /presences:
+    post:
+      tags: [Presences]
+      summary: Enregistrer présence
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Presence'
+      responses:
+        201:
+          description: Présence enregistrée
+
+  /statistiques/membre/{id}:
+    get:
+      tags: [Statistiques]
+      summary: Statistiques membre
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatistiqueMembre'
+
+  /statistiques/collectivite/{id}:
+    get:
+      tags: [Statistiques]
+      summary: Statistiques collectivité
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
