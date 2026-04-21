@@ -2,6 +2,379 @@ openapi: 3.0.3
 info:
   title: API Fédération Agricole
   version: 1.0.0
+  description: API de gestion des collectivités agricoles à Madagascar intégrant les règles métier réelles
 
 servers:
   - url: http://localhost:8080
+
+tags:
+  - name: Collectivites
+  - name: Membres
+  - name: Mandats
+  - name: Comptes
+  - name: Cotisations
+  - name: Activites
+  - name: Presences
+  - name: Statistiques
+
+paths:
+
+  /collectivites:
+    post:
+      tags: [Collectivites]
+      summary: Créer une collectivité
+      description: |
+        Conditions :
+        - Minimum 10 membres
+        - Ancienneté >= 6 mois
+        - Postes obligatoires remplis
+        - Validation par la fédération
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Collectivite'
+      responses:
+        201:
+          description: Collectivité créée
+        400:
+          description: Conditions non respectées
+
+    get:
+      tags: [Collectivites]
+      summary: Liste des collectivités
+      responses:
+        200:
+          description: OK
+
+  /membres:
+    post:
+      tags: [Membres]
+      summary: Ajouter un membre
+      description: |
+        Conditions :
+        - Parrainage par membre confirmé (>90 jours)
+        - Paiement du frais d’adhésion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Membre'
+      responses:
+        201:
+          description: Membre ajouté
+
+    get:
+      tags: [Membres]
+      summary: Liste des membres
+      responses:
+        200:
+          description: OK
+
+  /membres/{id}/changer-collectivite:
+    put:
+      tags: [Membres]
+      summary: Changer de collectivité
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Collectivité changée
+
+  /membres/{id}/demission:
+    put:
+      tags: [Membres]
+      summary: Démission d’un membre
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Démission effectuée
+
+  /mandats:
+    post:
+      tags: [Mandats]
+      summary: Créer un mandat
+      description: |
+        - Un seul membre par poste (président, trésorier, etc.)
+        - Maximum 2 mandats par poste
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mandat'
+      responses:
+        201:
+          description: Mandat créé
+
+    get:
+      tags: [Mandats]
+      summary: Liste des mandats
+      responses:
+        200:
+          description: OK
+
+  /comptes:
+    post:
+      tags: [Comptes]
+      summary: Créer un compte
+      description: |
+        - Une seule caisse autorisée
+        - Plusieurs comptes bancaires ou mobile money possibles
+        - Titulaire = personne réelle (membre)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Compte'
+      responses:
+        201:
+          description: Compte créé
+
+    get:
+      tags: [Comptes]
+      summary: Liste des comptes
+      responses:
+        200:
+          description: OK
+
+  /cotisations:
+    post:
+      tags: [Cotisations]
+      summary: Enregistrer une cotisation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cotisation'
+      responses:
+        201:
+          description: Cotisation enregistrée
+
+    get:
+      tags: [Cotisations]
+      summary: Liste des cotisations
+      responses:
+        200:
+          description: OK
+
+  /activites:
+    post:
+      tags: [Activites]
+      summary: Créer une activité
+      description: |
+        - Activité obligatoire ou exceptionnelle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activite'
+      responses:
+        201:
+          description: Activité créée
+
+    get:
+      tags: [Activites]
+      summary: Liste des activités
+      responses:
+        200:
+          description: OK
+
+  /presences:
+    post:
+      tags: [Presences]
+      summary: Enregistrer présence
+      description: |
+        - Le secrétaire enregistre les présences
+        - Un membre externe peut être enregistré mais non compté
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Presence'
+      responses:
+        201:
+          description: Présence enregistrée
+
+  /statistiques/membre/{id}:
+    get:
+      tags: [Statistiques]
+      summary: Statistiques d’un membre
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Statistiques récupérées
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatistiqueMembre'
+
+  /statistiques/collectivite/{id}:
+    get:
+      tags: [Statistiques]
+      summary: Statistiques d’une collectivité
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Statistiques récupérées
+
+components:
+  schemas:
+
+    Collectivite:
+      type: object
+      required: [nom, numero, ville, specialite]
+      properties:
+        id:
+          type: integer
+        nom:
+          type: string
+        numero:
+          type: string
+        ville:
+          type: string
+        specialite:
+          type: string
+        dateCreation:
+          type: string
+          format: date
+
+    Membre:
+      type: object
+      required: [nom, prenom, email, metier, domaine]
+      properties:
+        id:
+          type: integer
+        nom:
+          type: string
+        prenom:
+          type: string
+        email:
+          type: string
+        metier:
+          type: string
+          description: Métier (producteur, collecteur…)
+        domaine:
+          type: string
+          description: Domaine agricole (riziculture, élevage…)
+        telephone:
+          type: string
+        dateAdhesion:
+          type: string
+          format: date
+
+    Role:
+      type: string
+      enum:
+        - PRESIDENT
+        - VICE_PRESIDENT
+        - TRESORIER
+        - SECRETAIRE
+        - MEMBRE_CONFIRME
+        - MEMBRE_JUNIOR
+
+    Mandat:
+      type: object
+      properties:
+        id:
+          type: integer
+        role:
+          $ref: '#/components/schemas/Role'
+        dateDebut:
+          type: string
+          format: date
+        dateFin:
+          type: string
+          format: date
+
+    Compte:
+      type: object
+      required: [type, titulaireNom]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [CAISSE, BANCAIRE, MOBILE_MONEY]
+        titulaireNom:
+          type: string
+          description: Nom du titulaire réel
+        banque:
+          type: string
+        numeroCompte:
+          type: string
+        operateur:
+          type: string
+        numeroTelephone:
+          type: string
+        solde:
+          type: number
+
+    Cotisation:
+      type: object
+      properties:
+        id:
+          type: integer
+        montant:
+          type: number
+        date:
+          type: string
+          format: date
+        modePaiement:
+          type: string
+          enum: [ESPECE, VIREMENT, MOBILE_MONEY]
+
+    Activite:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [ASSEMBLEE, FORMATION, EXCEPTIONNELLE]
+        obligatoire:
+          type: boolean
+        date:
+          type: string
+          format: date
+
+    Presence:
+      type: object
+      properties:
+        membreId:
+          type: integer
+        activiteId:
+          type: integer
+        statut:
+          type: string
+          enum: [PRESENT, ABSENT, EXCUSE]
+
+    StatistiqueMembre:
+      type: object
+      properties:
+        tauxAssiduite:
+          type: number
+        montantTotal:
+          type: number
+        montantImpaye:
+          type: number

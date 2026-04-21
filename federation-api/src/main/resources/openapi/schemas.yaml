@@ -1,0 +1,140 @@
+components:
+  schemas:
+
+    Collectivite:
+      type: object
+      required: [nom, numero, ville, specialite]
+      properties:
+        id:
+          type: integer
+        nom:
+          type: string
+        numero:
+          type: string
+        ville:
+          type: string
+        specialite:
+          type: string
+        dateCreation:
+          type: string
+          format: date
+
+    Membre:
+      type: object
+      required: [nom, prenom, email, metier, domaine]
+      properties:
+        id:
+          type: integer
+        nom:
+          type: string
+        prenom:
+          type: string
+        email:
+          type: string
+        metier:
+          type: string
+          description: Métier réel (producteur, collecteur...)
+        domaine:
+          type: string
+          description: Domaine agricole (riziculture, élevage...)
+        telephone:
+          type: string
+        dateAdhesion:
+          type: string
+          format: date
+
+    Role:
+      type: string
+      enum:
+        - PRESIDENT
+        - VICE_PRESIDENT
+        - TRESORIER
+        - SECRETAIRE
+        - MEMBRE_CONFIRME
+        - MEMBRE_JUNIOR
+
+    Mandat:
+      type: object
+      properties:
+        id:
+          type: integer
+        role:
+          $ref: '#/components/schemas/Role'
+        dateDebut:
+          type: string
+          format: date
+        dateFin:
+          type: string
+          format: date
+
+    Compte:
+      type: object
+      required: [type, titulaireNom]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [CAISSE, BANCAIRE, MOBILE_MONEY]
+        titulaireNom:
+          type: string
+          description: Personne réelle (membre)
+        banque:
+          type: string
+        numeroCompte:
+          type: string
+        operateur:
+          type: string
+        numeroTelephone:
+          type: string
+        solde:
+          type: number
+
+    Cotisation:
+      type: object
+      properties:
+        id:
+          type: integer
+        montant:
+          type: number
+        date:
+          type: string
+          format: date
+        modePaiement:
+          type: string
+          enum: [ESPECE, VIREMENT, MOBILE_MONEY]
+
+    Activite:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [ASSEMBLEE, FORMATION, EXCEPTIONNELLE]
+        obligatoire:
+          type: boolean
+        date:
+          type: string
+          format: date
+
+    Presence:
+      type: object
+      properties:
+        membreId:
+          type: integer
+        activiteId:
+          type: integer
+        statut:
+          type: string
+          enum: [PRESENT, ABSENT, EXCUSE]
+
+    StatistiqueMembre:
+      type: object
+      properties:
+        tauxAssiduite:
+          type: number
+        montantTotal:
+          type: number
+        montantImpaye:
+          type: number

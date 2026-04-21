@@ -1,0 +1,100 @@
+paths:
+
+  /collectivites:
+    post:
+      tags: [Collectivites]
+      summary: Créer une collectivité
+      description: |
+        Conditions :
+        - Minimum 10 membres
+        - Ancienneté >= 6 mois
+        - Postes obligatoires remplis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Collectivite'
+      responses:
+        201:
+          description: Collectivité créée
+        400:
+          description: Conditions non respectées
+
+    get:
+      tags: [Collectivites]
+      summary: Liste des collectivités
+      responses:
+        200:
+          description: OK
+
+  /membres:
+    post:
+      tags: [Membres]
+      summary: Ajouter un membre
+      description: |
+        - Parrainage obligatoire
+        - Paiement requis
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Membre'
+      responses:
+        201:
+          description: Membre créé
+
+    get:
+      tags: [Membres]
+      summary: Liste des membres
+      responses:
+        200:
+          description: OK
+
+  /membres/{id}/changer-collectivite:
+    put:
+      tags: [Membres]
+      summary: Changer de collectivité
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Collectivité changée
+
+  /membres/{id}/demission:
+    put:
+      tags: [Membres]
+      summary: Démission
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Démission effectuée
+
+  /mandats:
+    post:
+      tags: [Mandats]
+      summary: Créer mandat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mandat'
+      responses:
+        201:
+          description: Mandat créé
+
+    get:
+      tags: [Mandats]
+      summary: Liste des mandats
+      responses:
+        200:
+          description: OK
