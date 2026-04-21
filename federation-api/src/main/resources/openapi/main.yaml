@@ -274,6 +274,35 @@ paths:
         200:
           description: Statistiques récupérées
 
+  /statistiques/federation:
+    get:
+      tags: [ Statistiques ]
+      summary: Rapport global fédération
+      description: |
+        Rapport contenant :
+
+        - Taux d’assiduité par collectivité
+        - % membres à jour de cotisation
+        - Nombre de nouveaux adhérents
+      parameters:
+        - in: query
+          name: dateDebut
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: dateFin
+          schema:
+            type: string
+            format: date
+      responses:
+        200:
+          description: Rapport généré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatistiqueFederation'
+
 components:
   schemas:
 
@@ -447,3 +476,20 @@ components:
           example: 50000
         cotisationAnnuelle:
           type: number
+
+    StatistiqueFederation:
+      type: object
+      properties:
+        collectivites:
+          type: array
+          items:
+            type: object
+            properties:
+              collectiviteId:
+                type: integer
+              tauxAssiduite:
+                type: number
+              pourcentageCotisation:
+                type: number
+              nouveauxAdherents:
+                type: integer
