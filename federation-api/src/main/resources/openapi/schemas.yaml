@@ -1,45 +1,45 @@
 components:
   schemas:
 
-    Collectivite:
+    Collective:
       type: object
-      required: [nom, numero, ville, specialite]
+      required: [name, number, city, specialty]
       properties:
         id:
           type: integer
-        nom:
+        name:
           type: string
-        numero:
+        number:
           type: string
-        ville:
+        city:
           type: string
-        specialite:
+        specialty:
           type: string
-        dateCreation:
+        createdAt:
           type: string
           format: date
 
-    Membre:
+    Member:
       type: object
-      required: [nom, prenom, email, metier, domaine]
+      required: [lastName, firstName, email, profession, field]
       properties:
         id:
           type: integer
-        nom:
+        lastName:
           type: string
-        prenom:
+        firstName:
           type: string
         email:
           type: string
-        metier:
+        profession:
           type: string
-          description: Métier réel (producteur, collecteur...)
-        domaine:
+          description: Actual profession (producer, collector...)
+        field:
           type: string
-          description: Domaine agricole (riziculture, élevage...)
-        telephone:
+          description: Agricultural field (rice farming, livestock...)
+        phone:
           type: string
-        dateAdhesion:
+        membershipDate:
           type: string
           format: date
 
@@ -48,93 +48,93 @@ components:
       enum:
         - PRESIDENT
         - VICE_PRESIDENT
-        - TRESORIER
-        - SECRETAIRE
-        - MEMBRE_CONFIRME
-        - MEMBRE_JUNIOR
+        - TREASURER
+        - SECRETARY
+        - CONFIRMED_MEMBER
+        - JUNIOR_MEMBER
 
-    Mandat:
+    Mandate:
       type: object
       properties:
         id:
           type: integer
         role:
           $ref: '#/components/schemas/Role'
-        dateDebut:
+        startDate:
           type: string
           format: date
-        dateFin:
+        endDate:
           type: string
           format: date
 
-    Compte:
+    Account:
       type: object
-      required: [type, titulaireNom]
+      required: [type, holderName]
       properties:
         id:
           type: integer
         type:
           type: string
-          enum: [CAISSE, BANCAIRE, MOBILE_MONEY]
-        titulaireNom:
+          enum: [CASH_BOX, BANK, MOBILE_MONEY]
+        holderName:
           type: string
-          description: Personne réelle (membre)
-        banque:
+          description: Real person (member)
+        bank:
           type: string
-        numeroCompte:
+        accountNumber:
           type: string
-        operateur:
+        operator:
           type: string
-        numeroTelephone:
+        phoneNumber:
           type: string
-        solde:
+        balance:
           type: number
 
-    Cotisation:
+    Contribution:
       type: object
       properties:
         id:
           type: integer
-        montant:
+        amount:
           type: number
         date:
           type: string
           format: date
-        modePaiement:
+        paymentMethod:
           type: string
-          enum: [ESPECE, VIREMENT, MOBILE_MONEY]
+          enum: [CASH, TRANSFER, MOBILE_MONEY]
 
-    Activite:
+    Activity:
       type: object
       properties:
         id:
           type: integer
         type:
           type: string
-          enum: [ASSEMBLEE, FORMATION, EXCEPTIONNELLE]
-        obligatoire:
+          enum: [ASSEMBLY, TRAINING, EXCEPTIONAL]
+        isMandatory:
           type: boolean
         date:
           type: string
           format: date
 
-    Presence:
+    Attendance:
       type: object
       properties:
-        membreId:
+        memberId:
           type: integer
-        activiteId:
+        activityId:
           type: integer
-        statut:
+        status:
           type: string
-          enum: [PRESENT, ABSENT, EXCUSE]
+          enum: [PRESENT, ABSENT, EXCUSED]
 
-    StatistiqueMembre:
+    MemberStatistics:
       type: object
       properties:
-        tauxAssiduite:
+        attendanceRate:
           type: number
-        montantTotal:
+        totalAmount:
           type: number
-        montantImpaye:
+        unpaidAmount:
           type: number

@@ -1,117 +1,116 @@
 openapi: 3.0.3
 info:
-  title: API Fédération Agricole
+  title: Agricultural Federation API
   version: 1.0.0
-  description: API de gestion des collectivités agricoles à Madagascar intégrant les règles métier réelles
+  description: Management API for agricultural collectives in Madagascar integrating real business rules.
 
 servers:
   - url: http://localhost:8080
 
 tags:
-  - name: Collectivites
-  - name: Membres
-  - name: Mandats
-  - name: Comptes
-  - name: Cotisations
-  - name: Activites
-  - name: Presences
-  - name: Statistiques
+  - name: Collectives
+  - name: Members
+  - name: Mandates
+  - name: Accounts
+  - name: Contributions
+  - name: Activities
+  - name: Attendance
+  - name: Statistics
 
 paths:
 
-  /collectivites:
+  /collectives:
     post:
-      tags: [Collectivites]
-      summary: Créer une collectivité
+      tags: [Collectives]
+      summary: Create a collective
       description: |
-        Conditions :
-        - Minimum 10 membres
-        - Ancienneté >= 6 mois
-        - Postes obligatoires remplis
-        - Validation par la fédération
+        Conditions:
+        - Minimum 10 members
+        - Seniority >= 6 months
+        - Required positions filled
+        - Validation by the federation
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Collectivite'
+              $ref: '#/components/schemas/Collective'
       responses:
         201:
-          description: Collectivité créée
+          description: Collective created
         400:
-          description: Conditions non respectées
+          description: Conditions not met
 
     get:
-      tags: [Collectivites]
-      summary: Liste des collectivités
+      tags: [Collectives]
+      summary: List collectives
       responses:
         200:
           description: OK
 
-  /membres:
+  /members:
     post:
-      tags: [Membres]
-      summary: Ajouter un membre
+      tags: [Members]
+      summary: Add a member
       description: |
-        Conditions :
-        - Parrainage par membre confirmé (>90 jours)
-        - Paiement du frais d’adhésion
+        Conditions:
+        - Sponsorship by a confirmed member (>90 days)
+        - Payment of membership fee
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Membre'
+              $ref: '#/components/schemas/Member'
       responses:
         201:
-          description: Membre ajouté
+          description: Member added
 
     get:
-      tags: [Membres]
-      summary: Liste des membres
+      tags: [Members]
+      summary: List members
       responses:
         200:
           description: OK
 
-  /membres/admission:
+  /members/admission:
     post:
-      tags: [ Membres ]
-      summary: Admission avancée d’un membre
+      tags: [ Members ]
+      summary: Advanced member admission
       description: |
-        Nouvelles conditions d’admission :
+        New admission conditions:
+        - Minimum 2 sponsors
+        - Sponsors from the target collective >= others
 
-        - Minimum 2 parrains
-        - Les parrains de la collectivité cible >= autres
+        Allowed cases:
+        - Sponsors mostly from the target collective
+        - Mix of local + external
 
-        Cas autorisés :
-        Parrains majoritairement de la collectivité cible
-         Mélange local + externe
+        Refused case:
+        - Only external sponsors
 
-        Cas refusé :
-          Parrains uniquement externes
+        Mandatory payment:
+        - 50,000 Ar membership fee
+        - Full annual contribution
 
-        Paiement obligatoire :
-        - 50.000 Ar frais d’adhésion
-        - Cotisation annuelle complète
-
-        Informations :
-        - relation avec chaque parrain
+        Information:
+        - relationship with each sponsor
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AdmissionMembre'
+            $ref: '#/components/schemas/MemberAdmission'
     responses:
       201:
-        description: Membre admis
+        description: Member admitted
       400:
-        description: Conditions non respectées
+        description: Conditions not met
 
-  /membres/{id}/changer-collectivite:
+  /members/{id}/change-collective:
     put:
-      tags: [Membres]
-      summary: Changer de collectivité
+      tags: [Members]
+      summary: Change collective
       parameters:
         - in: path
           name: id
@@ -120,12 +119,12 @@ paths:
             type: integer
       responses:
         200:
-          description: Collectivité changée
+          description: Collective changed
 
-  /membres/{id}/demission:
+  /members/{id}/resignation:
     put:
-      tags: [Membres]
-      summary: Démission d’un membre
+      tags: [Members]
+      summary: Member resignation
       parameters:
         - in: path
           name: id
@@ -134,118 +133,118 @@ paths:
             type: integer
       responses:
         200:
-          description: Démission effectuée
+          description: Resignation processed
 
 
-  /mandats:
+  /mandates:
     post:
-      tags: [Mandats]
-      summary: Créer un mandat
+      tags: [Mandates]
+      summary: Create a mandate
       description: |
-        - Un seul membre par poste (président, trésorier, etc.)
-        - Maximum 2 mandats par poste
+        - Only one member per position (president, treasurer, etc.)
+        - Maximum 2 mandates per position
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Mandat'
+              $ref: '#/components/schemas/Mandate'
       responses:
         201:
-          description: Mandat créé
+          description: Mandate created
 
     get:
-      tags: [Mandats]
-      summary: Liste des mandats
+      tags: [Mandates]
+      summary: List mandates
       responses:
         200:
           description: OK
 
-  /comptes:
+  /accounts:
     post:
-      tags: [Comptes]
-      summary: Créer un compte
+      tags: [Accounts]
+      summary: Create an account
       description: |
-        - Une seule caisse autorisée
-        - Plusieurs comptes bancaires ou mobile money possibles
-        - Titulaire = personne réelle (membre)
+        - Only one petty cash (caisse) allowed
+        - Multiple bank or mobile money accounts possible
+        - Holder = real person (member)
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Compte'
+              $ref: '#/components/schemas/Account'
       responses:
         201:
-          description: Compte créé
+          description: Account created
 
     get:
-      tags: [Comptes]
-      summary: Liste des comptes
+      tags: [Accounts]
+      summary: List accounts
       responses:
         200:
           description: OK
 
-  /cotisations:
+  /contributions:
     post:
-      tags: [Cotisations]
-      summary: Enregistrer une cotisation
+      tags: [Contributions]
+      summary: Record a contribution
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Cotisation'
+              $ref: '#/components/schemas/Contribution'
       responses:
         201:
-          description: Cotisation enregistrée
+          description: Contribution recorded
 
     get:
-      tags: [Cotisations]
-      summary: Liste des cotisations
+      tags: [Contributions]
+      summary: List contributions
       responses:
         200:
           description: OK
 
-  /activites:
+  /activities:
     post:
-      tags: [Activites]
-      summary: Créer une activité
+      tags: [Activities]
+      summary: Create an activity
       description: |
-        - Activité obligatoire ou exceptionnelle
+        - Mandatory or exceptional activity
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Activite'
+              $ref: '#/components/schemas/Activity'
       responses:
         201:
-          description: Activité créée
+          description: Activity created
 
     get:
-      tags: [Activites]
-      summary: Liste des activités
+      tags: [Activities]
+      summary: List activities
       responses:
         200:
           description: OK
 
-  /presences:
+  /attendance:
     post:
-      tags: [Presences]
-      summary: Enregistrer présence
+      tags: [Attendance]
+      summary: Record attendance
       description: |
-        - Le secrétaire enregistre les présences
-        - Un membre externe peut être enregistré mais non compté
+        - The secretary records attendance
+        - An external member can be recorded but not counted
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Presence'
+              $ref: '#/components/schemas/Attendance'
       responses:
         201:
-          description: Présence enregistrée
+          description: Attendance recorded
 
-  /statistiques/membre/{id}:
+  /statistics/member/{id}:
     get:
-      tags: [Statistiques]
-      summary: Statistiques d’un membre
+      tags: [Statistics]
+      summary: Member statistics
       parameters:
         - in: path
           name: id
@@ -254,16 +253,16 @@ paths:
             type: integer
       responses:
         200:
-          description: Statistiques récupérées
+          description: Statistics retrieved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatistiqueMembre'
+                $ref: '#/components/schemas/MemberStatistic'
 
-  /statistiques/collectivite/{id}:
+  /statistics/collective/{id}:
     get:
-      tags: [Statistiques]
-      summary: Statistiques d’une collectivité
+      tags: [Statistics]
+      summary: Collective statistics
       parameters:
         - in: path
           name: id
@@ -272,79 +271,78 @@ paths:
             type: integer
       responses:
         200:
-          description: Statistiques récupérées
+          description: Statistics retrieved
 
-  /statistiques/federation:
+  /statistics/federation:
     get:
-      tags: [ Statistiques ]
-      summary: Rapport global fédération
+      tags: [ Statistics ]
+      summary: Global federation report
       description: |
-        Rapport contenant :
-
-        - Taux d’assiduité par collectivité
-        - % membres à jour de cotisation
-        - Nombre de nouveaux adhérents
+        Report containing:
+        - Attendance rate by collective
+        - % members up to date with contributions
+        - Number of new members
       parameters:
         - in: query
-          name: dateDebut
+          name: startDate
           schema:
             type: string
             format: date
         - in: query
-          name: dateFin
+          name: endDate
           schema:
             type: string
             format: date
       responses:
         200:
-          description: Rapport généré
+          description: Report generated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatistiqueFederation'
+                $ref: '#/components/schemas/FederationStatistic'
 
 components:
   schemas:
 
-    Collectivite:
+    Collective:
       type: object
-      required: [nom, numero, ville, specialite]
+      required: [name, number, city, specialty]
       properties:
         id:
           type: integer
-        nom:
+        name:
           type: string
-        numero:
+        number:
           type: string
-        ville:
+        city:
           type: string
-        specialite:
+        specialty:
           type: string
-        dateCreation:
+        creationDate:
           type: string
           format: date
 
-    Membre:
+    Member:
       type: object
-      required: [nom, prenom, email, metier, domaine]
+      required: [lastName, firstName, email, profession, sector]
       properties:
         id:
           type: integer
-        nom:
+        lastName:
           type: string
-        prenom:
+        firstName:
           type: string
         email:
           type: string
-        metier:
+        profession:
           type: string
-          description: Métier (producteur, collecteur…)
-        domaine:
+          description: Profession (producer, collector...)
+        sector:
           type: string
-          description: Domaine agricole (riziculture, élevage…)
-        telephone:
+          description: Agricultural field (rice farming, livestock...)
+        phone:
           type: string
-        dateAdhesion:
+        membershipDate:
           type: string
           format: date
 
@@ -353,143 +351,143 @@ components:
       enum:
         - PRESIDENT
         - VICE_PRESIDENT
-        - TRESORIER
-        - SECRETAIRE
-        - MEMBRE_CONFIRME
-        - MEMBRE_JUNIOR
+        - TREASURER
+        - SECRETARY
+        - CONFIRMED_MEMBER
+        - JUNIOR_MEMBER
 
-    Mandat:
+    Mandate:
       type: object
       properties:
         id:
           type: integer
         role:
           $ref: '#/components/schemas/Role'
-        dateDebut:
+        startDate:
           type: string
           format: date
-        dateFin:
+        endDate:
           type: string
           format: date
 
-    Compte:
+    Account:
       type: object
-      required: [type, titulaireNom]
+      required: [type, holderName]
       properties:
         id:
           type: integer
         type:
           type: string
-          enum: [CAISSE, BANCAIRE, MOBILE_MONEY]
-        titulaireNom:
+          enum: [CASH_BOX, BANK, MOBILE_MONEY]
+        holderName:
           type: string
-          description: Nom du titulaire réel
-        banque:
+          description: Name of the actual holder
+        bank:
           type: string
-        numeroCompte:
+        accountNumber:
           type: string
-        operateur:
+        operator:
           type: string
-        numeroTelephone:
+        phoneNumber:
           type: string
-        solde:
+        balance:
           type: number
 
-    Cotisation:
+    Contribution:
       type: object
       properties:
         id:
           type: integer
-        montant:
+        amount:
           type: number
         date:
           type: string
           format: date
-        modePaiement:
+        paymentMethod:
           type: string
-          enum: [ESPECE, VIREMENT, MOBILE_MONEY]
+          enum: [CASH, TRANSFER, MOBILE_MONEY]
 
-    Activite:
+    Activity:
       type: object
       properties:
         id:
           type: integer
         type:
           type: string
-          enum: [ASSEMBLEE, FORMATION, EXCEPTIONNELLE]
-        obligatoire:
+          enum: [ASSEMBLY, TRAINING, EXCEPTIONAL]
+        isMandatory:
           type: boolean
         date:
           type: string
           format: date
 
-    Presence:
+    Attendance:
       type: object
       properties:
-        membreId:
+        memberId:
           type: integer
-        activiteId:
+        activityId:
           type: integer
-        statut:
+        status:
           type: string
-          enum: [PRESENT, ABSENT, EXCUSE]
+          enum: [PRESENT, ABSENT, EXCUSED]
 
-    StatistiqueMembre:
+    MemberStatistic:
       type: object
       properties:
-        tauxAssiduite:
+        attendanceRate:
           type: number
-        montantTotal:
+        totalAmount:
           type: number
-        montantImpaye:
+        unpaidAmount:
           type: number
 
-    AdmissionMembre:
+    MemberAdmission:
       type: object
-      required: [ nom, prenom, email, metier, domaine, parrains, cotisationAnnuelle ]
+      required: [ lastName, firstName, email, profession, sector, sponsors, annualContribution ]
       properties:
-        nom:
+        lastName:
           type: string
-        prenom:
+        firstName:
           type: string
         email:
           type: string
-        metier:
+        profession:
           type: string
-        domaine:
+        sector:
           type: string
-        parrains:
+        sponsors:
           type: array
           minItems: 2
           items:
             type: object
-            required: [ membreId, collectiviteId, relation ]
+            required: [ memberId, collectiveId, relation ]
             properties:
-              membreId:
+              memberId:
                 type: integer
-              collectiviteId:
+              collectiveId:
                 type: integer
               relation:
                 type: string
-        fraisAdhesion:
+        membershipFee:
           type: number
           example: 50000
-        cotisationAnnuelle:
+        annualContribution:
           type: number
 
-    StatistiqueFederation:
+    FederationStatistic:
       type: object
       properties:
-        collectivites:
+        collectives:
           type: array
           items:
             type: object
             properties:
-              collectiviteId:
+              collectiveId:
                 type: integer
-              tauxAssiduite:
+              attendanceRate:
                 type: number
-              pourcentageCotisation:
+              contributionPercentage:
                 type: number
-              nouveauxAdherents:
+              newMembers:
                 type: integer
