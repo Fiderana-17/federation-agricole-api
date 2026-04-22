@@ -4,17 +4,22 @@ import com.hei.federation_api.Entity.CreateCollectivity;
 import com.hei.federation_api.Repository.CollectivityRepository;
 import com.hei.federation_api.Repository.MemberRepository;
 
-import java.sql.SQLException;
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CollectivityService {
 
-    private final CollectivityRepository repository = new CollectivityRepository();
-    private final MemberRepository memberRepository = new MemberRepository();
+    private final CollectivityRepository repository;
+    private final MemberRepository memberRepository;
 
-    public List<String> create(List<CreateCollectivity> requests) throws SQLException {
+    public CollectivityService(DataSource dataSource) {
+        this.repository = new CollectivityRepository(dataSource);
+        this.memberRepository = new MemberRepository(dataSource);
+    }
+
+    public List<String> create(List<CreateCollectivity> requests) {
 
         List<String> ids = new ArrayList<>();
 
@@ -42,5 +47,26 @@ public class CollectivityService {
         }
 
         return ids;
+    }
+
+    public void assignIdentity(String id, String name, String number) {
+
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Collectivity not found");
+        }
+
+        if (repository.alreadyAssigned(id)) {
+            throw new RuntimeException("Identity already assigned");
+        }
+
+        if (repository.nameExists(name)) {
+            throw new RuntimeException("Name already exists");
+        }
+
+        if (repository.numberExists(number)) {
+            throw new RuntimeException("Number already exists");
+        }
+
+        repository.assignIdentity(id, name, number);
     }
 }
