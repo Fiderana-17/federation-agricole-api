@@ -1,8 +1,11 @@
 package com.hei.federation_api.Repository;
 
-import javax.sql.DataSource;
+import com.hei.federation_api.Config.DataSource;
+import org.springframework.stereotype.Repository;
+
 import java.sql.*;
 
+@Repository
 public class CollectivityRepository {
 
     private final DataSource dataSource;

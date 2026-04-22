@@ -1,14 +1,16 @@
 package com.hei.federation_api.Service;
 
+import com.hei.federation_api.Config.DataSource;
 import com.hei.federation_api.Entity.CreateCollectivity;
 import com.hei.federation_api.Repository.CollectivityRepository;
 import com.hei.federation_api.Repository.MemberRepository;
+import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class CollectivityService {
 
     private final CollectivityRepository repository;
@@ -35,14 +37,12 @@ public class CollectivityService {
 
             for (String memberId : req.members) {
                 if (!memberRepository.existsById(memberId)) {
-                    throw new RuntimeException("Member not found");
+                    throw new RuntimeException("Member not found: " + memberId);
                 }
             }
 
             String id = UUID.randomUUID().toString();
-
             repository.insert(id, req.location, req.federationApproval);
-
             ids.add(id);
         }
 

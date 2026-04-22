@@ -49,3 +49,7 @@ CREATE TABLE member_referees (
 ALTER TABLE collectivities
     ADD COLUMN name VARCHAR(150) UNIQUE,
     ADD COLUMN number VARCHAR(50) UNIQUE;
+
+INSERT INTO members(id, first_name, last_name, email) VALUES
+                                                          ('parrain-001', 'Jean', 'Rakoto', 'jean.rakoto@email.com'),
+                                                          ('parrain-002', 'Marie', 'Rabe', 'marie.rabe@email.com');

@@ -11,7 +11,10 @@ public class DataSource {
 
     public Connection getConnection() {
         try {
-            Dotenv dotenv = Dotenv.load();
+            Dotenv dotenv = Dotenv.configure()
+                    .directory(System.getProperty("user.dir") + "/federation-api")
+                    .ignoreIfMissing()
+                    .load();
             return DriverManager.getConnection(
                     dotenv.get("DB_URL"),
                     dotenv.get("DB_USER"),

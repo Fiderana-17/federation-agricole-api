@@ -1,16 +1,16 @@
 package com.hei.federation_api.Service;
 
+import com.hei.federation_api.Config.DataSource;
 import com.hei.federation_api.Entity.CreateMember;
 import com.hei.federation_api.Entity.Member;
 import com.hei.federation_api.Repository.MemberRepository;
+import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
+@Service
 public class MemberService {
 
     private final MemberRepository repository;
@@ -19,7 +19,7 @@ public class MemberService {
         this.repository = new MemberRepository(dataSource);
     }
 
-    public List<Member> create(List<CreateMember> requests) throws SQLException {
+    public List<Member> create(List<CreateMember> requests) {
 
         List<Member> result = new ArrayList<>();
 
@@ -33,10 +33,9 @@ public class MemberService {
                 throw new RuntimeException("Payment required");
             }
 
-            // vérifier parrains
             for (String ref : req.referees) {
                 if (!repository.existsById(ref)) {
-                    throw new RuntimeException("Referee not found");
+                    throw new RuntimeException("Referee not found: " + ref);
                 }
             }
 
@@ -47,7 +46,6 @@ public class MemberService {
             m.email = req.email;
 
             repository.insert(m);
-
             result.add(m);
         }
 

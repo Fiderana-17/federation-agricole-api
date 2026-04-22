@@ -1,8 +1,12 @@
 package com.hei.federation_api.Repository;
 
-import javax.sql.DataSource;
+import com.hei.federation_api.Config.DataSource;
+import com.hei.federation_api.Entity.Member;
+import org.springframework.stereotype.Repository;
+
 import java.sql.*;
 
+@Repository
 public class MemberRepository {
 
     private final DataSource dataSource;
@@ -25,7 +29,7 @@ public class MemberRepository {
         }
     }
 
-    public void insert(com.hei.federation_api.Entity.Member m) {
+    public void insert(Member m) {
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("""
                 INSERT INTO members(id, first_name, last_name, email)
