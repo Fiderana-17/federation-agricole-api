@@ -53,3 +53,41 @@ ALTER TABLE collectivities
 INSERT INTO members(id, first_name, last_name, email) VALUES
                                                           ('parrain-001', 'Jean', 'Rakoto', 'jean.rakoto@email.com'),
                                                           ('parrain-002', 'Marie', 'Rabe', 'marie.rabe@email.com');
+
+
+-- Membership fees
+CREATE TABLE membership_fees (
+                                 id VARCHAR PRIMARY KEY,
+                                 eligible_from DATE,
+                                 frequency VARCHAR NOT NULL,
+                                 amount DOUBLE PRECISION NOT NULL,
+                                 label VARCHAR,
+                                 status VARCHAR NOT NULL DEFAULT 'ACTIVE',
+                                 collectivity_id VARCHAR NOT NULL REFERENCES collectivities(id)
+);
+
+-- Member payments
+CREATE TABLE member_payments (
+                                 id VARCHAR PRIMARY KEY,
+                                 amount DOUBLE PRECISION NOT NULL,
+                                 payment_mode VARCHAR NOT NULL,
+                                 account_credited_id VARCHAR,
+                                 creation_date DATE NOT NULL,
+                                 member_id VARCHAR NOT NULL REFERENCES members(id),
+                                 membership_fee_id VARCHAR NOT NULL REFERENCES membership_fees(id)
+);
+
+-- Collectivity transactions
+CREATE TABLE collectivity_transactions (
+                                           id VARCHAR PRIMARY KEY,
+                                           creation_date DATE NOT NULL,
+                                           amount DOUBLE PRECISION NOT NULL,
+                                           payment_mode VARCHAR NOT NULL,
+                                           account_credited_id VARCHAR,
+                                           member_debited_id VARCHAR REFERENCES members(id),
+                                           collectivity_id VARCHAR NOT NULL REFERENCES collectivities(id)
+);
+
+-- Droits
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO agricultural_federation_db_manager;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO agricultural_federation_db_manager;
