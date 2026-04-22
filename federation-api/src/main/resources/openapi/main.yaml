@@ -301,6 +301,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/FederationStatistic'
 
+      '/collectivities/{id}/identity':
+        put:
+          summary: Assign name and number to a collectivity
+          description: |
+            Assign a unique name and number to a collectivity.
+            Once assigned, they cannot be modified.
+          parameters:
+            - in: path
+              name: id
+              required: true
+              schema:
+                type: string
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/AssignCollectivityIdentity'
+          responses:
+            200:
+              description: Collectivity updated with name and number
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Collectivity'
+            400:
+              description: Name or number already exists OR already assigned
+            404:
+              description: Collectivity not found
+
 components:
   schemas:
 
