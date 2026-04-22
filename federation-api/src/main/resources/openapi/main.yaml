@@ -521,3 +521,12 @@ components:
                 type: number
               newMembers:
                 type: integer
+
+      AssignCollectivityIdentity:
+        type: object
+        required: [ name, number ]
+        properties:
+          name:
+            type: string
+          number:
+            type: string
