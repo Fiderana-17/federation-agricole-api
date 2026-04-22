@@ -1,4 +1,4 @@
-package com.hei.federation_api.Entity;
+package com.hei.federation_api.Repository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
