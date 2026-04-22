@@ -1,5 +1,7 @@
 package com.hei.federation_api.Entity;
 
+import java.util.List;
+
 public class CreateMember {
 
     public String firstName;
