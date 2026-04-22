@@ -9,9 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 public class MemberService {
 
-    private final MemberRepository repository = new MemberRepository();
+    private final MemberRepository repository;
+
+    public MemberService(DataSource dataSource) {
+        this.repository = new MemberRepository(dataSource);
+    }
 
     public List<Member> create(List<CreateMember> requests) throws SQLException {
 
