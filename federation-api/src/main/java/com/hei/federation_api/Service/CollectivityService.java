@@ -20,7 +20,6 @@ public class CollectivityService {
 
         for (CreateCollectivity req : requests) {
 
-            // 🔴 VALIDATION A
             if (!req.federationApproval) {
                 throw new RuntimeException("Federation approval required");
             }
