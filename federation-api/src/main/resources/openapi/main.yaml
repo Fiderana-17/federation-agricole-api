@@ -4,11 +4,15 @@ info:
   description: |
     # Versioning
     This API uses semantic versioning (MAJOR.MINOR.PATCH). Available versions are : 
-    - v0.0.1 (2026-04-21) : POST /collectivities for collectivities creation and POST /members for members creation.
-  version: 0.0.1
+    - v0.0.1 (2026-04-21) : POST /collectivities and POST /members
+    - v0.0.2(2026-04-22) : Assign name and number to a collectivity
+  version: 0.0.2
+
 servers:
   - url: 'https://localhost:8080'
+
 paths:
+
   '/collectivities':
     post:
       summary: Create list of collectivities
@@ -16,6 +20,7 @@ paths:
         During collectivity request body creation, only members ID are provided to identify members. 
         But the response content includes members information, not only their IDs.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -35,10 +40,12 @@ paths:
           description: Collectivity without federation approval or structure missing.
         404:
           description: Member not found.
+
   '/members':
     post:
       summary: Create list of members
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -62,37 +69,39 @@ paths:
         404:
           description: Either collectivity or member not found.
 
-      '/collectivities/{id}/identity':
-        put:
-          summary: Assign name and number to a collectivity
-          description: |
-            Assign a unique name and number to a collectivity.
-            Once assigned, they cannot be modified.
-          parameters:
-            - in: path
-              name: id
-              required: true
+  '/collectivities/{id}/identity':
+    put:
+      summary: Assign name and number to a collectivity
+      description: |
+        Assign a unique name and number to a collectivity.
+        Once assigned, they cannot be modified.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignCollectivityIdentity'
+      responses:
+        200:
+          description: Collectivity updated with name and number
+          content:
+            application/json:
               schema:
-                type: string
-          requestBody:
-            required: true
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/AssignCollectivityIdentity'
-          responses:
-            200:
-              description: Collectivity updated with name and number
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/Collectivity'
-            400:
-              description: Name or number already exists OR already assigned
-            404:
-              description: Collectivity not found
+                $ref: '#/components/schemas/Collectivity'
+        400:
+          description: Name or number already exists OR already assigned
+        404:
+          description: Collectivity not found
+
 components:
   schemas:
+
     CreateCollectivity:
       type: object
       properties:
@@ -101,12 +110,12 @@ components:
         members:
           type: array
           items:
-            schema:
-              $ref: '#/components/schemas/MemberIdentifier'
+            $ref: '#/components/schemas/MemberIdentifier'
         federationApproval:
           type: boolean
         structure:
           $ref: '#/components/schemas/CreateCollectivityStructure'
+
     CreateCollectivityStructure:
       type: object
       properties:
@@ -118,6 +127,7 @@ components:
           $ref: '#/components/schemas/MemberIdentifier'
         secretary:
           $ref: '#/components/schemas/MemberIdentifier'
+
     CollectivityStructure:
       type: object
       properties:
@@ -129,6 +139,7 @@ components:
           $ref: '#/components/schemas/Member'
         secretary:
           $ref: '#/components/schemas/Member'
+
     Collectivity:
       type: object
       properties:
@@ -146,8 +157,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Member'
+
     MemberIdentifier:
       type: string
+
     CreateMember:
       type: object
       allOf:
@@ -163,6 +176,7 @@ components:
           type: boolean
         membershipDuesPaid:
           type: boolean
+
     MemberInformation:
       type: object
       properties:
@@ -180,11 +194,12 @@ components:
         profession:
           type: string
         phoneNumber:
-          type: int
+          type: integer
         email:
           type: string
         occupation:
           $ref: '#/components/schemas/MemberOccupation'
+
     Member:
       type: object
       allOf:
@@ -196,11 +211,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Member'
+
     Gender:
       type: string
       enum:
         - MALE
         - FEMALE
+
     MemberOccupation:
       type: string
       enum:
@@ -213,7 +230,9 @@ components:
 
     AssignCollectivityIdentity:
       type: object
-      required: [ name, number ]
+      required:
+        - name
+        - number
       properties:
         name:
           type: string
