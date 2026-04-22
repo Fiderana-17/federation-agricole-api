@@ -5,8 +5,6 @@ import com.hei.federation_api.Entity.MemberPayment;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public class MemberPaymentRepository {
@@ -21,7 +19,7 @@ public class MemberPaymentRepository {
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("""
                 INSERT INTO member_payments(id, amount, payment_mode, account_credited_id, creation_date, member_id, membership_fee_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?::date, ?, ?)
             """);
             ps.setString(1, payment.id);
             ps.setDouble(2, payment.amount);
