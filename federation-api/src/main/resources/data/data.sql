@@ -45,3 +45,7 @@ CREATE TABLE member_referees (
                                  FOREIGN KEY (member_id) REFERENCES members(id),
                                  FOREIGN KEY (referee_id) REFERENCES members(id)
 );
+
+ALTER TABLE collectivities
+    ADD COLUMN name VARCHAR(150) UNIQUE,
+    ADD COLUMN number VARCHAR(50) UNIQUE;
