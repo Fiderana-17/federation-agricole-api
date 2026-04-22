@@ -19,7 +19,6 @@ public class MemberService {
 
         for (CreateMember req : requests) {
 
-            // 🔴 VALIDATION B-2
             if (req.referees == null || req.referees.size() < 2) {
                 throw new RuntimeException("At least 2 referees required");
             }
