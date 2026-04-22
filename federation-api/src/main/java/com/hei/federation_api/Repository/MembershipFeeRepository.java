@@ -48,7 +48,7 @@ public class MembershipFeeRepository {
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("""
                 INSERT INTO membership_fees(id, eligible_from, frequency, amount, label, status, collectivity_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?::date, ?, ?, ?, ?, ?)
             """);
             ps.setString(1, fee.id);
             ps.setString(2, fee.eligibleFrom);

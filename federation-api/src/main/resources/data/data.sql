@@ -91,3 +91,8 @@ CREATE TABLE collectivity_transactions (
 -- Droits
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO agricultural_federation_db_manager;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO agricultural_federation_db_manager;
+
+-- Insérer des parrains
+INSERT INTO members(id, first_name, last_name, email) VALUES
+                                                          ('parrain-003', 'Jean', 'Rakoto', 'jean.rakoto@email.com'),
+                                                          ('parrain-002', 'Marie', 'Rabe', 'marie.rabe@email.com');
