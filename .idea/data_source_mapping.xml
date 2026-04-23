@@ -3,5 +3,6 @@
   <component name="DataSourcePerFileMappings">
     <file url="file://$PROJECT_DIR$/federation-api/src/main/resources/data/data.sql" value="fc340221-24fd-40fd-baaf-92c5799bdd18" />
     <file url="file://$PROJECT_DIR$/federation-api/src/main/resources/data/db.sql" value="fc340221-24fd-40fd-baaf-92c5799bdd18" />
+    <file url="file://$PROJECT_DIR$/federation-api/src/main/resources/data/schema.sql" value="fc340221-24fd-40fd-baaf-92c5799bdd18" />
   </component>
 </project>

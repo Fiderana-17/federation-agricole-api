@@ -37,7 +37,7 @@ public class CollectivityService {
                 }
             }
             String id = UUID.randomUUID().toString();
-            repository.insert(id, req.location, req.federationApproval);
+            repository.insert(id, req.location, req.specialization);
             ids.add(id);
         }
         return ids;

@@ -8,7 +8,7 @@ public class Collectivity {
     public String name;
     public String number;
     public String location;
-    public boolean federationApproval;
+    public String specialization;
     public List<Member> members;
 
     public Collectivity() {}

@@ -7,55 +7,26 @@ public class Member {
     public String id;
     public String firstName;
     public String lastName;
+    public String birthDate;
+    public String gender;
+    public String address;
+    public String profession;
+    public Long phoneNumber;
     public String email;
-
+    public String occupation;
+    public String collectivityId;
     public List<Member> referees;
 
-    public Member() {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.referees = referees;
-    }
+    public Member() {}
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setReferees(List<Member> referees) {
-        this.referees = referees;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public List<Member> getReferees() {
-        return referees;
-    }
+    public void setId(String id) { this.id = id; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setEmail(String email) { this.email = email; }
+    public void setReferees(List<Member> referees) { this.referees = referees; }
+    public String getId() { return id; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getEmail() { return email; }
+    public List<Member> getReferees() { return referees; }
 }
