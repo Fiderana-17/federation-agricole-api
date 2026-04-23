@@ -96,3 +96,34 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO agricultural_federatio
 INSERT INTO members(id, first_name, last_name, email) VALUES
                                                           ('parrain-003', 'Jean', 'Rakoto', 'jean.rakoto@email.com'),
                                                           ('parrain-002', 'Marie', 'Rabe', 'marie.rabe@email.com');
+
+TRUNCATE TABLE collectivity_transactions CASCADE;
+TRUNCATE TABLE member_payments CASCADE;
+TRUNCATE TABLE membership_fees CASCADE;
+TRUNCATE TABLE members CASCADE;
+TRUNCATE TABLE collectivities CASCADE;
+
+-- Table financial_accounts
+CREATE TABLE financial_accounts (
+                                    id VARCHAR PRIMARY KEY,
+                                    type VARCHAR NOT NULL, -- CASH, MOBILE_BANKING, BANK
+                                    holder_name VARCHAR,
+                                    mobile_banking_service VARCHAR,
+                                    mobile_number BIGINT,
+                                    bank_name VARCHAR,
+                                    bank_code INTEGER,
+                                    bank_branch_code INTEGER,
+                                    bank_account_number INTEGER,
+                                    bank_account_key INTEGER,
+                                    collectivity_id VARCHAR NOT NULL REFERENCES collectivities(id)
+);
+
+-- Colonne collectivity_id dans members si pas encore presente
+ALTER TABLE members ADD COLUMN IF NOT EXISTS collectivity_id VARCHAR REFERENCES collectivities(id);
+
+-- Colonne collectivity_id dans collectivity_transactions si pas encore presente
+ALTER TABLE collectivity_transactions ADD COLUMN IF NOT EXISTS collectivity_id VARCHAR REFERENCES collectivities(id);
+
+-- Droits
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO agricultural_federation_db_manager;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO agricultural_federation_db_manager;
