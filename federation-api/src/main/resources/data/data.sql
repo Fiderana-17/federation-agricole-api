@@ -127,3 +127,69 @@ ALTER TABLE collectivity_transactions ADD COLUMN IF NOT EXISTS collectivity_id V
 -- Droits
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO agricultural_federation_db_manager;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO agricultural_federation_db_manager;
+
+ALTER TABLE collectivities
+    ADD COLUMN specialization VARCHAR(100);
+
+
+
+
+
+INSERT INTO collectivities (id, name, number, location, federation_approval, specialization) VALUES
+                                                                                                 ('col-1', 'Mpanorina', '1', 'Ambatondrazaka', true, 'Riziculture'),
+                                                                                                 ('col-2', 'Dobo voalohany', '2', 'Ambatondrazaka', true, 'Pisciculture'),
+                                                                                                 ('col-3', 'Tantely mamy', '3', 'Brickaville', true, 'Apiculture');
+
+
+INSERT INTO members (id, first_name, last_name, birth_date, gender, address, profession, phone_number, email, occupation, collectivity_id) VALUES
+                                                                                                                                               ('C1-M1', 'Prénom membre 1', 'Nom membre 1', '1980-02-01', 'M', 'Lot II V M Ambato', 'Riziculteur', 341234567, 'member.1@fed-agri.mg', 'Président', 'col-1'),
+                                                                                                                                               ('C1-M2', 'Prénom membre 2', 'Nom membre 2', '1982-03-05', 'M', 'Lot II F Ambato', 'Agriculteur', 321234567, 'member.2@fed-agri.mg', 'Vice président', 'col-1'),
+                                                                                                                                               ('C1-M3', 'Prénom membre 3', 'Nom membre 3', '1992-03-10', 'M', 'Lot II J Ambato', 'Collecteur', 331234567, 'member.3@fed-agri.mg', 'Secrétaire', 'col-1'),
+                                                                                                                                               ('C1-M4', 'Prénom membre 4', 'Nom membre 4', '1988-05-22', 'F', 'Lot A K 50 Ambato', 'Distributeur', 381234567, 'member.4@fed-agri.mg', 'Trésorier', 'col-1'),
+                                                                                                                                               ('C1-M5', 'Prénom membre 5', 'Nom membre 5', '1999-08-21', 'M', 'Lot UV 80 Ambato', 'Riziculteur', 373434567, 'member.5@fed-agri.mg', 'Confirmé', 'col-1'),
+                                                                                                                                               ('C1-M6', 'Prénom membre 6', 'Nom membre 6', '1998-08-22', 'F', 'Lot UV 6 Ambato', 'Riziculteur', 372234567, 'member.6@fed-agri.mg', 'Confirmé', 'col-1'),
+                                                                                                                                               ('C1-M7', 'Prénom membre 7', 'Nom membre 7', '1998-01-31', 'M', 'Lot UV 7 Ambato', 'Riziculteur', 374234567, 'member.7@fed-agri.mg', 'Confirmé', 'col-1'),
+                                                                                                                                               ('C1-M8', 'Prénom membre 6', 'Nom membre 8', '1975-08-20', 'M', 'Lot UV 8 Ambato', 'Riziculteur', 370234567, 'member.8@fed-agri.mg', 'Confirmé', 'col-1');
+
+
+
+
+INSERT INTO members (id, first_name, last_name, birth_date, gender, address, profession, phone_number, email, occupation, collectivity_id) VALUES
+                                                                                                                                               ('C2-M1', 'Prénom membre 1', 'Nom membre 1', '1980-02-01', 'M', 'Lot II V M Ambato', 'Riziculteur', 341234567, 'member.1@fed-agri.mg', 'Confirmé', 'col-2'),
+                                                                                                                                               ('C2-M2', 'Prénom membre 2', 'Nom membre 2', '1982-03-05', 'M', 'Lot II F Ambato', 'Agriculteur', 321234567, 'member.2@fed-agri.mg', 'Confirmé', 'col-2'),
+                                                                                                                                               ('C2-M3', 'Prénom membre 3', 'Nom membre 3', '1992-03-10', 'M', 'Lot II J Ambato', 'Collecteur', 331234567, 'member.3@fed-agri.mg', 'Confirmé', 'col-2'),
+                                                                                                                                               ('C2-M4', 'Prénom membre 4', 'Nom membre 4', '1988-05-22', 'F', 'Lot A K 50 Ambato', 'Distributeur', 381234567, 'member.4@fed-agri.mg', 'Confirmé', 'col-2'),
+                                                                                                                                               ('C2-M5', 'Prénom membre 5', 'Nom membre 5', '1999-08-21', 'M', 'Lot UV 80 Ambato', 'Riziculteur', 373434567, 'member.5@fed-agri.mg', 'Président', 'col-2'),
+                                                                                                                                               ('C2-M6', 'Prénom membre 6', 'Nom membre 6', '1998-08-22', 'F', 'Lot UV 6 Ambato', 'Riziculteur', 372234567, 'member.6@fed-agri.mg', 'Vice président', 'col-2'),
+                                                                                                                                               ('C2-M7', 'Prénom membre 7', 'Nom membre 7', '1998-01-31', 'M', 'Lot UV 7 Ambato', 'Riziculteur', 374234567, 'member.7@fed-agri.mg', 'Secrétaire', 'col-2'),
+                                                                                                                                               ('C2-M8', 'Prénom membre 6', 'Nom membre 8', '1975-08-20', 'M', 'Lot UV 8 Ambato', 'Riziculteur', 370234567, 'member.8@fed-agri.mg', 'Trésorier', 'col-2');
+
+
+
+INSERT INTO collectivity_members VALUES
+                                     ('col-1','C1-M1'),('col-1','C1-M2'),('col-1','C1-M3'),('col-1','C1-M4'),
+                                     ('col-1','C1-M5'),('col-1','C1-M6'),('col-1','C1-M7'),('col-1','C1-M8'),
+
+                                     ('col-2','C2-M1'),('col-2','C2-M2'),('col-2','C2-M3'),('col-2','C2-M4'),
+                                     ('col-2','C2-M5'),('col-2','C2-M6'),('col-2','C2-M7'),('col-2','C2-M8');
+
+
+INSERT INTO collectivity_structure VALUES
+                                       ('col-1','C1-M1','C1-M2','C1-M4','C1-M3'),
+                                       ('col-2','C2-M5','C2-M6','C2-M8','C2-M7');
+
+
+INSERT INTO member_referees VALUES
+                                ('C1-M3','C1-M1'),('C1-M3','C1-M2'),
+                                ('C1-M4','C1-M1'),('C1-M4','C1-M2'),
+                                ('C1-M5','C1-M1'),('C1-M5','C1-M2'),
+                                ('C1-M6','C1-M1'),('C1-M6','C1-M2'),
+                                ('C1-M7','C1-M1'),('C1-M7','C1-M2'),
+                                ('C1-M8','C1-M6'),('C1-M8','C1-M7'),
+
+                                ('C2-M3','C2-M1'),('C2-M3','C2-M2'),
+                                ('C2-M4','C2-M1'),('C2-M4','C2-M2'),
+                                ('C2-M5','C2-M1'),('C2-M5','C2-M2'),
+                                ('C2-M6','C2-M1'),('C2-M6','C2-M2'),
+                                ('C2-M7','C2-M1'),('C2-M7','C2-M2'),
+                                ('C2-M8','C2-M6'),('C2-M8','C2-M7');
