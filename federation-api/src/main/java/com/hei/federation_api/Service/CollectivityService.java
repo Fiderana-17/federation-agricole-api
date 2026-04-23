@@ -1,6 +1,7 @@
 package com.hei.federation_api.Service;
 
 import com.hei.federation_api.Config.DataSource;
+import com.hei.federation_api.Entity.Collectivity;
 import com.hei.federation_api.Entity.CreateCollectivity;
 import com.hei.federation_api.Repository.CollectivityRepository;
 import com.hei.federation_api.Repository.MemberRepository;
@@ -22,51 +23,47 @@ public class CollectivityService {
     }
 
     public List<String> create(List<CreateCollectivity> requests) {
-
         List<String> ids = new ArrayList<>();
-
         for (CreateCollectivity req : requests) {
-
             if (!req.federationApproval) {
                 throw new RuntimeException("Federation approval required");
             }
-
             if (req.structure == null) {
                 throw new RuntimeException("Structure required");
             }
-
             for (String memberId : req.members) {
                 if (!memberRepository.existsById(memberId)) {
                     throw new RuntimeException("Member not found: " + memberId);
                 }
             }
-
             String id = UUID.randomUUID().toString();
             repository.insert(id, req.location, req.federationApproval);
             ids.add(id);
         }
-
         return ids;
     }
 
     public void assignIdentity(String id, String name, String number) {
-
         if (!repository.existsById(id)) {
             throw new RuntimeException("Collectivity not found");
         }
-
         if (repository.alreadyAssigned(id)) {
             throw new RuntimeException("Identity already assigned");
         }
-
         if (repository.nameExists(name)) {
             throw new RuntimeException("Name already exists");
         }
-
         if (repository.numberExists(number)) {
             throw new RuntimeException("Number already exists");
         }
-
         repository.assignIdentity(id, name, number);
+    }
+
+    public Collectivity getById(String id) {
+        Collectivity c = repository.findById(id);
+        if (c == null) {
+            throw new RuntimeException("Collectivity not found");
+        }
+        return c;
     }
 }
