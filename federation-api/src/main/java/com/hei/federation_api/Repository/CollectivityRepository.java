@@ -1,9 +1,13 @@
 package com.hei.federation_api.Repository;
 
 import com.hei.federation_api.Config.DataSource;
+import com.hei.federation_api.Entity.Collectivity;
+import com.hei.federation_api.Entity.Member;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class CollectivityRepository {
@@ -96,6 +100,54 @@ public class CollectivityRepository {
             ps.setString(2, number);
             ps.setString(3, id);
             ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Collectivity findById(String id) {
+        try (Connection conn = dataSource.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("""
+                SELECT id, name, number, location, federation_approval
+                FROM collectivities WHERE id = ?
+            """);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Collectivity c = new Collectivity();
+                c.id = rs.getString("id");
+                c.name = rs.getString("name");
+                c.number = rs.getString("number");
+                c.location = rs.getString("location");
+                c.federationApproval = rs.getBoolean("federation_approval");
+                c.members = findMembersByCollectivityId(conn, id);
+                return c;
+            }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Member> findMembersByCollectivityId(Connection conn, String collectivityId) {
+        List<Member> list = new ArrayList<>();
+        try {
+            PreparedStatement ps = conn.prepareStatement("""
+                SELECT m.id, m.first_name, m.last_name, m.email
+                FROM members m
+                WHERE m.collectivity_id = ?
+            """);
+            ps.setString(1, collectivityId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Member m = new Member();
+                m.id = rs.getString("id");
+                m.firstName = rs.getString("first_name");
+                m.lastName = rs.getString("last_name");
+                m.email = rs.getString("email");
+                list.add(m);
+            }
+            return list;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
