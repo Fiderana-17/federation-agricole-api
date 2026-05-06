@@ -4,6 +4,6 @@ public class CollectivityLocalStatistics {
     public MemberDescription memberDescription;
     public Double earnedAmount;
     public Double unpaidAmount;
-    public Double assiduityPercentage; // v0.0.7 Bonus 2
+    public Double assiduityPercentage;
     public CollectivityLocalStatistics() {}
 }
