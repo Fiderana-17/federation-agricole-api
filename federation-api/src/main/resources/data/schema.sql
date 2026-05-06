@@ -7,8 +7,9 @@ CREATE TABLE IF NOT EXISTS collectivities (
                                               location VARCHAR
 );
 
+SELECT * FROM collectivities;
 
-alter table collectivities add column specialization VARCHAR(100);
+
 
 CREATE TABLE IF NOT EXISTS members (
                                        id VARCHAR PRIMARY KEY,
@@ -78,3 +79,31 @@ CREATE TABLE IF NOT EXISTS collectivity_transactions (
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO agricultural_federation_db_manager;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO agricultural_federation_db_manager;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO agricultural_federation_db_manager;
+
+-- Colonne membership_date dans members
+ALTER TABLE members ADD COLUMN IF NOT EXISTS membership_date DATE DEFAULT CURRENT_DATE;
+UPDATE members SET membership_date = CURRENT_DATE WHERE membership_date IS NULL;
+
+-- Table activities (v0.0.6)
+CREATE TABLE IF NOT EXISTS activities (
+                                          id VARCHAR PRIMARY KEY,
+                                          label VARCHAR NOT NULL,
+                                          activity_type VARCHAR NOT NULL,
+                                          member_occupation_concerned VARCHAR,
+                                          recurrence_week_ordinal INTEGER,
+                                          recurrence_day_of_week VARCHAR,
+                                          executive_date DATE,
+                                          collectivity_id VARCHAR NOT NULL REFERENCES collectivities(id)
+);
+
+-- Table attendance (v0.0.6)
+CREATE TABLE IF NOT EXISTS attendance (
+                                          id VARCHAR PRIMARY KEY,
+                                          activity_id VARCHAR NOT NULL REFERENCES activities(id),
+                                          member_id VARCHAR NOT NULL REFERENCES members(id),
+                                          attendance_status VARCHAR NOT NULL DEFAULT 'UNDEFINED'
+);
+
+-- Droits
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO agricultural_federation_db_manager;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO agricultural_federation_db_manager;
