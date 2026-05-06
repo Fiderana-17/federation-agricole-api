@@ -6,6 +6,5 @@ public class MemberDescription {
     public String lastName;
     public String email;
     public String occupation;
-
     public MemberDescription() {}
 }
