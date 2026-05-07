@@ -82,14 +82,15 @@ public class ActivityRepository {
         }
     }
 
-    public String getAttendanceStatus(String activityId, String memberId) {
+    public String getAttendanceStatus(String activityId, String memberId, String occurrenceDate) {
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("""
                 SELECT attendance_status FROM attendance
-                WHERE activity_id = ? AND member_id = ?
+                WHERE activity_id = ? AND member_id = ? AND occurrence_date = ?::date
             """);
             ps.setString(1, activityId);
             ps.setString(2, memberId);
+            ps.setString(3, occurrenceDate);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getString("attendance_status");
             return null;
@@ -98,17 +99,19 @@ public class ActivityRepository {
         }
     }
 
-    public ActivityMemberAttendance insertAttendance(String activityId, String memberId, String status) {
+    public ActivityMemberAttendance insertAttendance(
+            String activityId, String memberId, String status, String occurrenceDate) {
         String id = UUID.randomUUID().toString();
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("""
-                INSERT INTO attendance(id, activity_id, member_id, attendance_status)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO attendance(id, activity_id, member_id, attendance_status, occurrence_date)
+                VALUES (?, ?, ?, ?, ?::date)
             """);
             ps.setString(1, id);
             ps.setString(2, activityId);
             ps.setString(3, memberId);
             ps.setString(4, status);
+            ps.setString(5, occurrenceDate);
             ps.executeUpdate();
 
             ActivityMemberAttendance att = new ActivityMemberAttendance();
@@ -127,6 +130,7 @@ public class ActivityRepository {
                 SELECT
                     att.id,
                     att.attendance_status,
+                    att.occurrence_date,
                     m.id AS member_id,
                     m.first_name,
                     m.last_name,
@@ -135,6 +139,7 @@ public class ActivityRepository {
                 FROM attendance att
                 JOIN members m ON m.id = att.member_id
                 WHERE att.activity_id = ?
+                ORDER BY att.occurrence_date
             """);
             ps.setString(1, activityId);
             ResultSet rs = ps.executeQuery();
@@ -158,25 +163,29 @@ public class ActivityRepository {
         }
     }
 
-    // Bonus 2 : taux d'assiduité d'un membre — calcul 100% en SQL
+    // Bonus 2 : taux d'assiduité d'un membre
+    // IMPORTANT : on exclut les occurrences où le membre vient d'une autre collectivité
+    // On compte uniquement les occurrences de la collectivité du membre
     public Double getAttendanceRate(String memberId, String collectivityId, String from, String to) {
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("""
                 SELECT
                     CASE
-                        WHEN COUNT(DISTINCT a.id) = 0 THEN 0
+                        WHEN COUNT(DISTINCT occ.id) = 0 THEN 0
                         ELSE ROUND(
                             100.0 * COUNT(DISTINCT CASE
-                                WHEN att.attendance_status = 'ATTENDED' THEN a.id
-                            END) / NULLIF(COUNT(DISTINCT a.id), 0),
+                                WHEN att.attendance_status = 'ATTENDED' THEN occ.id
+                            END) / NULLIF(COUNT(DISTINCT occ.id), 0),
                         2)
                     END AS attendance_rate
-                FROM activities a
+                FROM activity_occurrences occ
+                JOIN activities a ON a.id = occ.activity_id
                 LEFT JOIN attendance att
-                    ON att.activity_id = a.id
+                    ON att.activity_id = occ.activity_id
                     AND att.member_id = ?
+                    AND att.occurrence_date = occ.occurrence_date
                 WHERE a.collectivity_id = ?
-                AND a.executive_date BETWEEN ?::date AND ?::date
+                AND occ.occurrence_date BETWEEN ?::date AND ?::date
             """);
             ps.setString(1, memberId);
             ps.setString(2, collectivityId);
@@ -190,36 +199,42 @@ public class ActivityRepository {
         }
     }
 
-    // Bonus 2 : taux d'assiduité global d'une collectivité — calcul 100% en SQL
+    // Bonus 2 : taux d'assiduité global d'une collectivité
+    // IMPORTANT : on exclut les membres externes (pas membres de cette collectivité)
     public Double getCollectivityAttendanceRate(String collectivityId, String from, String to) {
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("""
                 SELECT
                     CASE
-                        WHEN COUNT(DISTINCT a.id) * COUNT(DISTINCT m.id) = 0 THEN 0
+                        WHEN COUNT(DISTINCT occ.id) * COUNT(DISTINCT m.id) = 0 THEN 0
                         ELSE ROUND(
                             100.0 * COUNT(DISTINCT CASE
                                 WHEN att.attendance_status = 'ATTENDED'
-                                THEN att.member_id || '-' || att.activity_id
+                                -- Exclure les membres externes
+                                AND m.collectivity_id = ?
+                                THEN att.member_id || '-' || occ.id
                             END) / NULLIF(
-                                COUNT(DISTINCT a.id) * COUNT(DISTINCT m.id),
+                                COUNT(DISTINCT occ.id) * COUNT(DISTINCT m.id),
                                 0
                             ),
                         2)
                     END AS attendance_rate
-                FROM activities a
+                FROM activity_occurrences occ
+                JOIN activities a ON a.id = occ.activity_id
                 CROSS JOIN members m
                 LEFT JOIN attendance att
-                    ON att.activity_id = a.id
+                    ON att.activity_id = occ.activity_id
                     AND att.member_id = m.id
+                    AND att.occurrence_date = occ.occurrence_date
                 WHERE a.collectivity_id = ?
                 AND m.collectivity_id = ?
-                AND a.executive_date BETWEEN ?::date AND ?::date
+                AND occ.occurrence_date BETWEEN ?::date AND ?::date
             """);
             ps.setString(1, collectivityId);
             ps.setString(2, collectivityId);
-            ps.setString(3, from);
-            ps.setString(4, to);
+            ps.setString(3, collectivityId);
+            ps.setString(4, from);
+            ps.setString(5, to);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getDouble("attendance_rate");
             return 0.0;
