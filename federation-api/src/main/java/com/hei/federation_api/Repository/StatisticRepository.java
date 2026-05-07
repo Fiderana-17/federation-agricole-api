@@ -17,8 +17,9 @@ public class StatisticRepository {
         this.dataSource = dataSource;
     }
 
-    // v0.0.5 : GET /collectivites/{id}/statistics
-    // Tout le calcul est fait en SQL (push down processing)
+    // GET /collectivites/{id}/statistics
+    // earnedAmount = total payé par le membre sur la période
+    // unpaidAmount = total des cotisations ACTIVES dues mais non payées sur la période
     public List<CollectivityLocalStatistics> getMemberStatistics(String collectivityId, String from, String to) {
         List<CollectivityLocalStatistics> list = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
@@ -32,11 +33,30 @@ public class StatisticRepository {
                     COALESCE(SUM(mp.amount), 0) AS earned_amount,
                     GREATEST(
                         (
-                            SELECT COALESCE(SUM(mf.amount), 0)
+                            SELECT COALESCE(SUM(
+                                CASE
+                                    -- ANNUALLY : due_date = eligible_from + 1 an
+                                    -- Si due_date est dans la période => cotisation due
+                                    WHEN mf.frequency = 'ANNUALLY'
+                                    AND (mf.eligible_from + INTERVAL '1 year')::date BETWEEN ?::date AND ?::date
+                                    THEN mf.amount
+
+                                    -- MONTHLY : due_date = eligible_from + 1 mois
+                                    WHEN mf.frequency = 'MONTHLY'
+                                    AND (mf.eligible_from + INTERVAL '1 month')::date BETWEEN ?::date AND ?::date
+                                    THEN mf.amount
+
+                                    -- PUNCTUALLY : due_date = eligible_from lui-même
+                                    WHEN mf.frequency = 'PUNCTUALLY'
+                                    AND mf.eligible_from BETWEEN ?::date AND ?::date
+                                    THEN mf.amount
+
+                                    ELSE 0
+                                END
+                            ), 0)
                             FROM membership_fees mf
                             WHERE mf.collectivity_id = ?
                             AND mf.status = 'ACTIVE'
-                            AND mf.eligible_from BETWEEN ?::date AND ?::date
                         ) - COALESCE(SUM(mp.amount), 0),
                         0
                     ) AS unpaid_amount
@@ -47,12 +67,22 @@ public class StatisticRepository {
                 WHERE m.collectivity_id = ?
                 GROUP BY m.id, m.first_name, m.last_name, m.email, m.occupation
             """);
-            ps.setString(1, collectivityId);
-            ps.setString(2, from);
-            ps.setString(3, to);
-            ps.setString(4, from);
-            ps.setString(5, to);
-            ps.setString(6, collectivityId);
+            // Paramètres pour ANNUALLY
+            ps.setString(1, from);
+            ps.setString(2, to);
+            // Paramètres pour MONTHLY
+            ps.setString(3, from);
+            ps.setString(4, to);
+            // Paramètres pour PUNCTUALLY
+            ps.setString(5, from);
+            ps.setString(6, to);
+            // collectivity_id pour le sous-select
+            ps.setString(7, collectivityId);
+            // Paramètres pour member_payments
+            ps.setString(8, from);
+            ps.setString(9, to);
+            // collectivity_id pour WHERE membres
+            ps.setString(10, collectivityId);
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -76,8 +106,8 @@ public class StatisticRepository {
         }
     }
 
-    // v0.0.5 : GET /collectivites/statistics
-    // Tout le calcul est fait en SQL (push down processing)
+    // GET /collectivites/statistics
+    // % membres à jour + nouveaux adhérents par collectivité
     public List<CollectivityOverallStatistics> getOverallStatistics(String from, String to) {
         List<CollectivityOverallStatistics> list = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
@@ -96,16 +126,33 @@ public class StatisticRepository {
                         ELSE ROUND(
                             100.0 * COUNT(DISTINCT CASE
                                 WHEN (
+                                    -- Total payé par le membre sur la période
                                     SELECT COALESCE(SUM(mp.amount), 0)
                                     FROM member_payments mp
                                     WHERE mp.member_id = m.id
                                     AND mp.creation_date BETWEEN ?::date AND ?::date
                                 ) >= (
-                                    SELECT COALESCE(SUM(mf.amount), 0)
+                                    -- Total des cotisations ACTIVES dues sur la période
+                                    SELECT COALESCE(SUM(
+                                        CASE
+                                            WHEN mf.frequency = 'ANNUALLY'
+                                            AND (mf.eligible_from + INTERVAL '1 year')::date BETWEEN ?::date AND ?::date
+                                            THEN mf.amount
+
+                                            WHEN mf.frequency = 'MONTHLY'
+                                            AND (mf.eligible_from + INTERVAL '1 month')::date BETWEEN ?::date AND ?::date
+                                            THEN mf.amount
+
+                                            WHEN mf.frequency = 'PUNCTUALLY'
+                                            AND mf.eligible_from BETWEEN ?::date AND ?::date
+                                            THEN mf.amount
+
+                                            ELSE 0
+                                        END
+                                    ), 0)
                                     FROM membership_fees mf
                                     WHERE mf.collectivity_id = c.id
                                     AND mf.status = 'ACTIVE'
-                                    AND mf.eligible_from BETWEEN ?::date AND ?::date
                                 )
                                 THEN m.id
                             END) / NULLIF(COUNT(DISTINCT m.id), 0),
@@ -115,12 +162,21 @@ public class StatisticRepository {
                 LEFT JOIN members m ON m.collectivity_id = c.id
                 GROUP BY c.id, c.name, c.number
             """);
+            // new_members_number
             ps.setString(1, from);
             ps.setString(2, to);
+            // total payé
             ps.setString(3, from);
             ps.setString(4, to);
+            // ANNUALLY
             ps.setString(5, from);
             ps.setString(6, to);
+            // MONTHLY
+            ps.setString(7, from);
+            ps.setString(8, to);
+            // PUNCTUALLY
+            ps.setString(9, from);
+            ps.setString(10, to);
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
