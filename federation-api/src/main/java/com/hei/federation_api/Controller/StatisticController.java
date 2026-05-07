@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 // Note: URL est /collectivites (sans i) comme dans la spec OAS
 @RestController
-@RequestMapping("/collectivites")
+@RequestMapping("/collectivities")
 public class StatisticController {
 
     private final StatisticService service;

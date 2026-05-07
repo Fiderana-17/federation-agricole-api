@@ -17,7 +17,6 @@ public class StatisticRepository {
         this.dataSource = dataSource;
     }
 
-    // v0.0.5 : GET /collectivites/{id}/statistics
     // Tout le calcul est fait en SQL (push down processing)
     public List<CollectivityLocalStatistics> getMemberStatistics(String collectivityId, String from, String to) {
         List<CollectivityLocalStatistics> list = new ArrayList<>();
@@ -76,7 +75,6 @@ public class StatisticRepository {
         }
     }
 
-    // v0.0.5 : GET /collectivites/statistics
     // Tout le calcul est fait en SQL (push down processing)
     public List<CollectivityOverallStatistics> getOverallStatistics(String from, String to) {
         List<CollectivityOverallStatistics> list = new ArrayList<>();
