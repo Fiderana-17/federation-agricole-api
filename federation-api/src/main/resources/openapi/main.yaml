@@ -1,493 +1,240 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
-  title: Agricultural Federation API
-  version: 1.0.0
-  description: Management API for agricultural collectives in Madagascar integrating real business rules.
+  title: Agricultural federation API
+  description: |
+    # Versioning
+    This API uses semantic versioning (MAJOR.MINOR.PATCH). Available versions are : 
+    - v0.0.1 (2026-04-21) : POST /collectivities and POST /members
+    - v0.0.2(2026-04-22) : Assign name and number to a collectivity
+  version: 0.0.2
 
 servers:
-  - url: http://localhost:8080
-
-tags:
-  - name: Collectives
-  - name: Members
-  - name: Mandates
-  - name: Accounts
-  - name: Contributions
-  - name: Activities
-  - name: Attendance
-  - name: Statistics
+  - url: 'https://localhost:8080'
 
 paths:
 
-  /collectives:
+  '/collectivities':
     post:
-      tags: [Collectives]
-      summary: Create a collective
+      summary: Create list of collectivities
       description: |
-        Conditions:
-        - Minimum 10 members
-        - Seniority >= 6 months
-        - Required positions filled
-        - Validation by the federation
+        During collectivity request body creation, only members ID are provided to identify members. 
+        But the response content includes members information, not only their IDs.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Collective'
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateCollectivity'
       responses:
         201:
-          description: Collective created
+          description: List of created collectivities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collectivity'
         400:
-          description: Conditions not met
+          description: Collectivity without federation approval or structure missing.
+        404:
+          description: Member not found.
 
-    get:
-      tags: [Collectives]
-      summary: List collectives
-      responses:
-        200:
-          description: OK
-
-  /members:
+  '/members':
     post:
-      tags: [Members]
-      summary: Add a member
-      description: |
-        Conditions:
-        - Sponsorship by a confirmed member (>90 days)
-        - Payment of membership fee
+      summary: Create list of members
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Member'
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateMember'
       responses:
         201:
-          description: Member added
-
-    get:
-      tags: [Members]
-      summary: List members
-      responses:
-        200:
-          description: OK
-
-  /members/admission:
-    post:
-      tags: [ Members ]
-      summary: Advanced member admission
-      description: |
-        New admission conditions:
-        - Minimum 2 sponsors
-        - Sponsors from the target collective >= others
-
-        Allowed cases:
-        - Sponsors mostly from the target collective
-        - Mix of local + external
-
-        Refused case:
-        - Only external sponsors
-
-        Mandatory payment:
-        - 50,000 Ar membership fee
-        - Full annual contribution
-
-        Information:
-        - relationship with each sponsor
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MemberAdmission'
-    responses:
-      201:
-        description: Member admitted
-      400:
-        description: Conditions not met
-
-  /members/{id}/change-collective:
-    put:
-      tags: [Members]
-      summary: Change collective
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          description: Collective changed
-
-  /members/{id}/resignation:
-    put:
-      tags: [Members]
-      summary: Member resignation
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          description: Resignation processed
-
-
-  /mandates:
-    post:
-      tags: [Mandates]
-      summary: Create a mandate
-      description: |
-        - Only one member per position (president, treasurer, etc.)
-        - Maximum 2 mandates per position
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Mandate'
-      responses:
-        201:
-          description: Mandate created
-
-    get:
-      tags: [Mandates]
-      summary: List mandates
-      responses:
-        200:
-          description: OK
-
-  /accounts:
-    post:
-      tags: [Accounts]
-      summary: Create an account
-      description: |
-        - Only one petty cash (caisse) allowed
-        - Multiple bank or mobile money accounts possible
-        - Holder = real person (member)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Account'
-      responses:
-        201:
-          description: Account created
-
-    get:
-      tags: [Accounts]
-      summary: List accounts
-      responses:
-        200:
-          description: OK
-
-  /contributions:
-    post:
-      tags: [Contributions]
-      summary: Record a contribution
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Contribution'
-      responses:
-        201:
-          description: Contribution recorded
-
-    get:
-      tags: [Contributions]
-      summary: List contributions
-      responses:
-        200:
-          description: OK
-
-  /activities:
-    post:
-      tags: [Activities]
-      summary: Create an activity
-      description: |
-        - Mandatory or exceptional activity
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Activity'
-      responses:
-        201:
-          description: Activity created
-
-    get:
-      tags: [Activities]
-      summary: List activities
-      responses:
-        200:
-          description: OK
-
-  /attendance:
-    post:
-      tags: [Attendance]
-      summary: Record attendance
-      description: |
-        - The secretary records attendance
-        - An external member can be recorded but not counted
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Attendance'
-      responses:
-        201:
-          description: Attendance recorded
-
-  /statistics/member/{id}:
-    get:
-      tags: [Statistics]
-      summary: Member statistics
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          description: Statistics retrieved
+          description: List of created members
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MemberStatistic'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Member'
+        400:
+          description: |
+            The following case must return a bad request exception : 
+            - Member with bad referees or without proper payment.
+            - Membership dues not paid or registration fee not paid.
+        404:
+          description: Either collectivity or member not found.
 
-  /statistics/collective/{id}:
-    get:
-      tags: [Statistics]
-      summary: Collective statistics
+  '/collectivities/{id}/identity':
+    put:
+      summary: Assign name and number to a collectivity
+      description: |
+        Assign a unique name and number to a collectivity.
+        Once assigned, they cannot be modified.
       parameters:
         - in: path
           name: id
           required: true
           schema:
-            type: integer
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignCollectivityIdentity'
       responses:
         200:
-          description: Statistics retrieved
-
-  /statistics/federation:
-    get:
-      tags: [ Statistics ]
-      summary: Global federation report
-      description: |
-        Report containing:
-        - Attendance rate by collective
-        - % members up to date with contributions
-        - Number of new members
-      parameters:
-        - in: query
-          name: startDate
-          schema:
-            type: string
-            format: date
-        - in: query
-          name: endDate
-          schema:
-            type: string
-            format: date
-      responses:
-        200:
-          description: Report generated
+          description: Collectivity updated with name and number
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FederationStatistic'
+                $ref: '#/components/schemas/Collectivity'
+        400:
+          description: Name or number already exists OR already assigned
+        404:
+          description: Collectivity not found
 
 components:
   schemas:
 
-    Collective:
+    CreateCollectivity:
       type: object
-      required: [name, number, city, specialty]
+      properties:
+        location:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberIdentifier'
+        federationApproval:
+          type: boolean
+        structure:
+          $ref: '#/components/schemas/CreateCollectivityStructure'
+
+    CreateCollectivityStructure:
+      type: object
+      properties:
+        president:
+          $ref: '#/components/schemas/MemberIdentifier'
+        vicePresident:
+          $ref: '#/components/schemas/MemberIdentifier'
+        treasurer:
+          $ref: '#/components/schemas/MemberIdentifier'
+        secretary:
+          $ref: '#/components/schemas/MemberIdentifier'
+
+    CollectivityStructure:
+      type: object
+      properties:
+        president:
+          $ref: '#/components/schemas/Member'
+        vicePresident:
+          $ref: '#/components/schemas/Member'
+        treasurer:
+          $ref: '#/components/schemas/Member'
+        secretary:
+          $ref: '#/components/schemas/Member'
+
+    Collectivity:
+      type: object
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
         number:
           type: string
-        city:
+        location:
           type: string
-        specialty:
+        structure:
+          $ref: '#/components/schemas/CollectivityStructure'
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+
+    MemberIdentifier:
+      type: string
+
+    CreateMember:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/MemberInformation'
+      properties:
+        collectivityIdentifier:
           type: string
-        creationDate:
+        referees:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberIdentifier'
+        registrationFeePaid:
+          type: boolean
+        membershipDuesPaid:
+          type: boolean
+
+    MemberInformation:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthDate:
           type: string
           format: date
+        gender:
+          $ref: '#/components/schemas/Gender'
+        address:
+          type: string
+        profession:
+          type: string
+        phoneNumber:
+          type: integer
+        email:
+          type: string
+        occupation:
+          $ref: '#/components/schemas/MemberOccupation'
 
     Member:
       type: object
-      required: [lastName, firstName, email, profession, sector]
+      allOf:
+        - $ref: '#/components/schemas/MemberInformation'
       properties:
         id:
-          type: integer
-        lastName:
-          type: string
-        firstName:
-          type: string
-        email:
-          type: string
-        profession:
-          type: string
-          description: Profession (producer, collector...)
-        sector:
-          type: string
-          description: Agricultural field (rice farming, livestock...)
-        phone:
-          type: string
-        membershipDate:
-          type: string
-          format: date
+          $ref: '#/components/schemas/MemberIdentifier'
+        referees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
 
-    Role:
+    Gender:
       type: string
       enum:
-        - PRESIDENT
-        - VICE_PRESIDENT
-        - TREASURER
+        - MALE
+        - FEMALE
+
+    MemberOccupation:
+      type: string
+      enum:
+        - JUNIOR
+        - SENIOR
         - SECRETARY
-        - CONFIRMED_MEMBER
-        - JUNIOR_MEMBER
+        - TREASURER
+        - VICE_PRESIDENT
+        - PRESIDENT
 
-    Mandate:
+    AssignCollectivityIdentity:
       type: object
+      required:
+        - name
+        - number
       properties:
-        id:
-          type: integer
-        role:
-          $ref: '#/components/schemas/Role'
-        startDate:
+        name:
           type: string
-          format: date
-        endDate:
+        number:
           type: string
-          format: date
-
-    Account:
-      type: object
-      required: [type, holderName]
-      properties:
-        id:
-          type: integer
-        type:
-          type: string
-          enum: [CASH_BOX, BANK, MOBILE_MONEY]
-        holderName:
-          type: string
-          description: Name of the actual holder
-        bank:
-          type: string
-        accountNumber:
-          type: string
-        operator:
-          type: string
-        phoneNumber:
-          type: string
-        balance:
-          type: number
-
-    Contribution:
-      type: object
-      properties:
-        id:
-          type: integer
-        amount:
-          type: number
-        date:
-          type: string
-          format: date
-        paymentMethod:
-          type: string
-          enum: [CASH, TRANSFER, MOBILE_MONEY]
-
-    Activity:
-      type: object
-      properties:
-        id:
-          type: integer
-        type:
-          type: string
-          enum: [ASSEMBLY, TRAINING, EXCEPTIONAL]
-        isMandatory:
-          type: boolean
-        date:
-          type: string
-          format: date
-
-    Attendance:
-      type: object
-      properties:
-        memberId:
-          type: integer
-        activityId:
-          type: integer
-        status:
-          type: string
-          enum: [PRESENT, ABSENT, EXCUSED]
-
-    MemberStatistic:
-      type: object
-      properties:
-        attendanceRate:
-          type: number
-        totalAmount:
-          type: number
-        unpaidAmount:
-          type: number
-
-    MemberAdmission:
-      type: object
-      required: [ lastName, firstName, email, profession, sector, sponsors, annualContribution ]
-      properties:
-        lastName:
-          type: string
-        firstName:
-          type: string
-        email:
-          type: string
-        profession:
-          type: string
-        sector:
-          type: string
-        sponsors:
-          type: array
-          minItems: 2
-          items:
-            type: object
-            required: [ memberId, collectiveId, relation ]
-            properties:
-              memberId:
-                type: integer
-              collectiveId:
-                type: integer
-              relation:
-                type: string
-        membershipFee:
-          type: number
-          example: 50000
-        annualContribution:
-          type: number
-
-    FederationStatistic:
-      type: object
-      properties:
-        collectives:
-          type: array
-          items:
-            type: object
-            properties:
-              collectiveId:
-                type: integer
-              attendanceRate:
-                type: number
-              contributionPercentage:
-                type: number
-              newMembers:
-                type: integer
