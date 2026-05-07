@@ -45,14 +45,17 @@ public class ActivityController {
         }
     }
 
+    // occurrenceDate en query param : ?occurrenceDate=2026-03-07
     @PostMapping("/{id}/activities/{activityId}/attendance")
     public ResponseEntity<?> createAttendance(
             @PathVariable String id,
             @PathVariable String activityId,
+            @RequestParam String occurrenceDate,
             @RequestBody List<CreateActivityMemberAttendance> request
     ) {
         try {
-            return ResponseEntity.status(201).body(service.createAttendance(id, activityId, request));
+            return ResponseEntity.status(201).body(
+                    service.createAttendance(id, activityId, occurrenceDate, request));
         } catch (RuntimeException e) {
             if (e.getMessage().contains("not found")) {
                 return ResponseEntity.status(404).body(e.getMessage());

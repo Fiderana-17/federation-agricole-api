@@ -24,14 +24,12 @@ public class ActivityService {
         this.memberRepository = new MemberRepository(dataSource);
     }
 
-    // POST /collectivities/{id}/activities
     public List<CollectivityActivity> create(String collectivityId, List<CreateCollectivityActivity> requests) {
         if (!collectivityRepository.existsById(collectivityId)) {
             throw new RuntimeException("Collectivity not found");
         }
         List<CollectivityActivity> result = new ArrayList<>();
         for (CreateCollectivityActivity req : requests) {
-            // Validation : pas les deux en même temps
             if (req.recurrenceRule != null && req.executiveDate != null) {
                 throw new RuntimeException("Cannot provide both recurrenceRule and executiveDate");
             }
@@ -48,7 +46,6 @@ public class ActivityService {
         return result;
     }
 
-    // GET /collectivities/{id}/activities
     public List<CollectivityActivity> getAll(String collectivityId) {
         if (!collectivityRepository.existsById(collectivityId)) {
             throw new RuntimeException("Collectivity not found");
@@ -56,10 +53,11 @@ public class ActivityService {
         return repository.findByCollectivityId(collectivityId);
     }
 
-    // POST /collectivities/{id}/activities/{activityId}/attendance
+    // occurrenceDate est maintenant obligatoire dans le body ou en query param
     public List<ActivityMemberAttendance> createAttendance(
             String collectivityId,
             String activityId,
+            String occurrenceDate,
             List<CreateActivityMemberAttendance> requests
     ) {
         if (!collectivityRepository.existsById(collectivityId)) {
@@ -71,14 +69,14 @@ public class ActivityService {
 
         List<ActivityMemberAttendance> result = new ArrayList<>();
         for (CreateActivityMemberAttendance req : requests) {
-            String existing = repository.getAttendanceStatus(activityId, req.memberIdentifier);
-            // MISSING ou ATTENDED ne peuvent plus être modifiés
+            String existing = repository.getAttendanceStatus(activityId, req.memberIdentifier, occurrenceDate);
+            // MISSING ou ATTENDED ne peuvent plus être modifiés une fois enregistrés
             if (existing != null && !existing.equals("UNDEFINED")) {
                 throw new RuntimeException("Attendance already confirmed for member: " + req.memberIdentifier);
             }
-            ActivityMemberAttendance att = repository.insertAttendance(activityId, req.memberIdentifier, req.attendanceStatus);
+            ActivityMemberAttendance att = repository.insertAttendance(
+                    activityId, req.memberIdentifier, req.attendanceStatus, occurrenceDate);
 
-            // Remplir memberDescription
             Member m = memberRepository.findById(req.memberIdentifier);
             if (m != null) {
                 MemberDescription desc = new MemberDescription();
@@ -94,7 +92,6 @@ public class ActivityService {
         return result;
     }
 
-    // GET /collectivities/{id}/activities/{activityId}/attendance
     public List<ActivityMemberAttendance> getAttendance(String collectivityId, String activityId) {
         if (!collectivityRepository.existsById(collectivityId)) {
             throw new RuntimeException("Collectivity not found");
