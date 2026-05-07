@@ -193,3 +193,6 @@ INSERT INTO member_referees VALUES
                                 ('C2-M6','C2-M1'),('C2-M6','C2-M2'),
                                 ('C2-M7','C2-M1'),('C2-M7','C2-M2'),
                                 ('C2-M8','C2-M6'),('C2-M8','C2-M7');
+
+ALTER TABLE financial_accounts
+    ALTER COLUMN bank_account_number TYPE BIGINT;
