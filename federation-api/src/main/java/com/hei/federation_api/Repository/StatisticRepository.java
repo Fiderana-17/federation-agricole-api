@@ -17,9 +17,7 @@ public class StatisticRepository {
         this.dataSource = dataSource;
     }
 
-    // GET /collectivites/{id}/statistics
-    // earnedAmount = total payé par le membre sur la période
-    // unpaidAmount = total des cotisations ACTIVES dues mais non payées sur la période
+    // Tout le calcul est fait en SQL (push down processing)
     public List<CollectivityLocalStatistics> getMemberStatistics(String collectivityId, String from, String to) {
         List<CollectivityLocalStatistics> list = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
@@ -106,8 +104,7 @@ public class StatisticRepository {
         }
     }
 
-    // GET /collectivites/statistics
-    // % membres à jour + nouveaux adhérents par collectivité
+    // Tout le calcul est fait en SQL (push down processing)
     public List<CollectivityOverallStatistics> getOverallStatistics(String from, String to) {
         List<CollectivityOverallStatistics> list = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
