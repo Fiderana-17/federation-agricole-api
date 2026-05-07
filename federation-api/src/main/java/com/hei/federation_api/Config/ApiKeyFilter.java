@@ -1,10 +1,10 @@
 package com.hei.federation_api.Config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -13,8 +13,15 @@ import java.io.IOException;
 @Component
 public class ApiKeyFilter extends OncePerRequestFilter {
 
-    @Value("${api.key}")
-    private String validApiKey;
+    private final String validApiKey;
+
+    public ApiKeyFilter() {
+        Dotenv dotenv = Dotenv.configure()
+                .directory(System.getProperty("user.dir") + "/federation-api")
+                .ignoreIfMissing()
+                .load();
+        this.validApiKey = dotenv.get("API_KEY", "agri-secure-key");
+    }
 
     @Override
     protected void doFilterInternal(
